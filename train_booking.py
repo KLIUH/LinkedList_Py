@@ -9,6 +9,7 @@ class TrainNode:
         self.available_seat = available_seat
         self.next = None
 
+
 class TrainLinkedList:
     def __init__(self):
         self.head = None
@@ -17,31 +18,25 @@ class TrainLinkedList:
         try:
             with open(filename, 'r') as file:
                 for line in file:
-                    try:
-                        data = line.strip().split(" | ")
-                        if len(data) < 7:
-                            print("Error: Incomplete data in line:", line)
-                            continue  # Bỏ qua dòng nếu dữ liệu không đủ
-                        tcode = data[0]
-                        tname = data[1]
-                        seat = int(data[2])
-                        booked = int(data[3])
-                        depart_time = data[4]
-                        depart_place = data[5]
-                        available_seat = int(data[6])
-                        new_node = TrainNode(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
-                        if not self.head:
-                            self.head = new_node
-                            self.tail = new_node  # Cập nhật con trỏ đến cuối danh sách
-                        else:
-                            self.tail.next = new_node
-                            self.tail = new_node
-                    except (ValueError, IndexError) as e:
-                        print("Error processing line:", line, ":", e)
+                    data = line.strip().split(" | ")
+                    tcode = data[0]
+                    tname = data[1]
+                    seat = int(data[2])
+                    booked = int(data[3])
+                    depart_time = data[4]
+                    depart_place = data[5]
+                    available_seat = int(data[6])  # Additional piece of information
+                    new_node = TrainNode(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
+                    if not self.head:
+                        self.head = new_node
+                    else:
+                        current = self.head
+                        while current.next:
+                            current = current.next
+                        current.next = new_node
             print("Data loaded successfully.")
         except FileNotFoundError:
             print("File not found.")
-
     
     def input_and_add_to_head(self, tcode, tname, seat, booked, depart_time, depart_place, available_seat):
         new_node = TrainNode(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
@@ -64,20 +59,22 @@ class TrainLinkedList:
                 while current:
                     file.write(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}\n")
                     current = current.next
-            print("The ship list has been saved to the file successfully.")
+            print("Danh sách tàu đã được lưu vào tệp thành công.")
         except Exception as e:
             print(f"Lỗi khi lưu tệp: {e}")
 
     def search_by_tcode(self, tcode):
         current = self.head
+        found = False
         while current:
             if current.tcode == tcode:
                 print("Train found:")
                 print(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}")
-                return current  # Trả về nút tìm thấy
+                found = True
+                break
             current = current.next
-        print("Train not found.")
-        return None  # Trả về None nếu không tìm thấy
+        if not found:
+            print("Train not found.")
     
     def delete_by_tcode(self, tcode):
         current = self.head
@@ -207,31 +204,18 @@ class CustomerLinkedList:
         if not self.head:  # Nếu danh sách rỗng
             self.head = new_node
         else:
-            current = self.head
-            while current.next:  # Duyệt đến node cuối cùng của danh sách
-                current = current.next
-            current.next = new_node  # Thêm node mới vào cuối danh sách
+            new_node.next = self.head  # Node mới trỏ tới node hiện tại của danh sách
+            self.head = new_node  # Cập nhật con trỏ head để trỏ tới node mới thêm vào
         print("Customer added successfully.")
+
 
     def display_data(self):
         print("ccode | name | phone")
-        print("---------------------------")
         current = self.head
         while current:
             print(f"{current.ccode} | {current.name} | {current.phone}")
             current = current.next
     
-    def search_by_ccode(self, ccode):
-        current = self.head
-        while current:
-            if current.ccode == ccode:
-                print("Customer found:")
-                print(f"{current.ccode} | {current.name} | {current.phone}")
-                return current  # Trả về nút tìm thấy
-            current = current.next
-        print("Customer not found.")
-        return None  # Trả về None nếu không tìm thấy
-
     def save_data_to_file(self, filename):
         try:
             with open(filename, 'w') as file:  # Mở file để ghi (mode 'w')
@@ -243,7 +227,18 @@ class CustomerLinkedList:
         except Exception as e:
             print(f"Error saving file: {e}")
 
-    
+    def search_by_ccode(self, ccode):
+        current = self.head
+        found = False
+        while current:
+            if current.ccode == ccode:
+                print("Customer found:")
+                print(f"{current.ccode} | {current.name} | {current.phone}")
+                found = True
+                break
+            current = current.next
+        if not found:
+            print("Customer not found.")
 
     def delete_by_ccode(self, ccode):
         current = self.head
@@ -300,7 +295,6 @@ class BookingLinkedList:
     def __init__(self):
         self.head = None
 
-
     def input_data(self, train_list, customer_list):
         tcode = input("Enter train code: ")
         ccode = input("Enter customer code: ")
@@ -321,13 +315,8 @@ class BookingLinkedList:
                 current = current.next
             current.next = new_booking
         print("Booking data added successfully.")
-    
-    def print_booking_header(self):  
-        print("Train Code | Customer Code | Number of Seats")
-        print("---------------------------------------------")
 
-    def display_data(self): 
-        self.print_booking_header()  
+    def display_data(self):
         current = self.head
         while current:
             print(f"{current.tcode} | {current.ccode} | {current.num_seats}")
@@ -356,28 +345,23 @@ class BookingLinkedList:
         new_node.next = current.next
         current.next = new_node
         return sorted_head
-    
-    
+
     def is_valid_booking(self, train_list, customer_list, tcode, ccode, num_seats):
-        # Tìm kiếm train và customer trong danh sách
         train = train_list.search_by_tcode(tcode)
         customer = customer_list.search_by_ccode(ccode)
 
-        # Kiểm tra xem train và customer có tồn tại không
         if not train or not customer:
             print("tcode or ccode not found.")
             return False
 
-        # Kiểm tra số lượng ghế còn trống trong train
-        if train.available_seat < num_seats:
-            print("Not enough available seats on the train.")
+        if train.booked + num_seats > train.seat:
+            print("The train is exhausted.")
             return False
 
-        # Kiểm tra xem đã có booking nào cho cặp tcode và ccode này chưa
         current = self.head
         while current:
             if current.tcode == tcode and current.ccode == ccode:
-                print("Booking for this tcode and ccode already exists.")
+                print("tcode and ccode already exist in the booking list.")
                 return False
             current = current.next
 
@@ -413,13 +397,6 @@ def display_booking_menu():
     print("3.2. Display data with available seats")
     print("3.3. Sort by tcode + ccode")
 
-def display_main_menu():
-    print("Main Menu:")
-    print("1. Train List")
-    print("2. Customer List")
-    print("3. Booking List")
-    print("4. Exit")
-
 def main():
     train_list = TrainLinkedList()
     customer_list = CustomerLinkedList()
@@ -428,115 +405,93 @@ def main():
     # Initialize CustomerLinkedList and BookingLinkedList
 
     while True:
-        display_main_menu()
-        choice = input("Enter your choice: ")
-
-        if choice == '1':
-            display_train_menu()
-            train_choice = input("Enter your choice for Train List: ")
-            if train_choice == '1.1':
-                filename = input("Enter file name: ")
-                train_list.load_data_from_file(filename)
-
-            elif train_choice == '1.2':
-                tcode = input("Enter train code: ")
-                tname = input("Enter train name: ")
-                seat = int(input("Enter number of seats: "))
-                booked = int(input("Enter number of booked seats: "))
-                depart_time = input("Enter departure time: ")
-                depart_place = input("Enter departure place: ")
-                available_seat = seat - booked
-                train_list.input_and_add_to_head(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
-
-            elif train_choice == '1.3':
-                print("Train List:")
-                train_list.display_data()
-
-            elif train_choice == '1.4':
-                filename = input("Enter file name to save train list: ")
-                train_list.save_data_to_file(filename)
-
-            elif train_choice == '1.5':
-                tcode_to_search = input("Enter the tcode to search: ")
-                train_list.search_by_tcode(tcode_to_search)
-
-            elif train_choice == '1.6':
-                tcode_to_delete = input("Enter the tcode to delete: ")
-                train_list.delete_by_tcode(tcode_to_delete)
-            # Implement other menu options for Train list
-
-            elif train_choice == '1.7':
-                train_list.sort_by_tcode()
-                print("Train list sorted by tcode.")
-
-
-            elif train_choice == '1.8':
-                k = int(input("Enter the position k: "))
-                tcode = input("Enter train code: ")
-                tname = input("Enter train name: ")
-                seat = int(input("Enter number of seats: "))
-                booked = int(input("Enter number of booked seats: "))
-                depart_time = input("Enter departure time: ")
-                depart_place = input("Enter departure place: ")
-                available_seat = seat - booked
-                train_list.add_after_position_k(k, tcode, tname, seat, booked, depart_time, depart_place, available_seat)
-
-            elif train_choice == '1.9':
-                xCode = input("Enter the tcode before which you want to delete the previous node: ")
-                train_list.delete_node_before_tcode(xCode)
-            else:
-                print("Invalid choice for Train List.")
-
-
-# //////////////////////////////////////////////////////////////////////////
-
-        elif choice == '2':
-            display_customer_menu()
-            customer_choice = input("Enter your choice for Customer List: ")
-            if customer_choice == '2.1':
-                filename = input("Enter file name: ")
-                customer_list.load_data_from_file(filename)
-                display_customer_menu()
-            elif customer_choice == '2.2':
-                ccode = input("Enter customer code: ")
-                cname = input("Enter customer name: ")
-                phone = input("Enter customer phone: ")
-                customer_list.input_and_add_to_end(ccode, cname, phone)
-            elif customer_choice == '2.3':
-                customer_list.display_data()
-            elif customer_choice == '2.4':
-                filename = input("Enter file name to save customer list: ")
-                customer_list.save_data_to_file(filename)
-
-            elif customer_choice == '2.5':
-                ccode_to_search = input("Enter the ccode to search: ")
-                customer_list.search_by_ccode(ccode_to_search)
-            elif customer_choice == '2.6':
-                ccode_to_delete = input("Enter the ccode to delete: ")
-                customer_list.delete_by_ccode(ccode_to_delete)
-            else:
-                print("Invalid choice for Train List.")
-
-# //////////////////////////////////////////////////////////////////////////
-        elif choice == '3':
-            display_booking_menu()
-            booking_choice = input("Enter your choice for Booking List: ")
-            if booking_choice == '3.1':
-                booking_list.input_data(train_list, customer_list)
-            elif booking_choice == '3.2':
-                booking_list.display_data()
-            elif booking_choice == '3.3':
-                booking_list.sort_by_tcode_ccode()
-                booking_list.display_data()
-            elif booking_choice == '3.4':  # Thêm một lựa chọn để quay lại menu chính
-                break
-            else:
-                print("Invalid choice. Please try again.")
+        display_train_menu()
+        display_customer_menu()
+        display_booking_menu()
         
-        elif choice == '4':
-            print("Exiting program.")
-            break
+        choice = input("Enter your choice for Train list: ")
 
+        if choice == '1.1':
+            filename = input("Enter file name: ")
+            train_list.load_data_from_file(filename)
+
+        elif choice == '1.2':
+            tcode = input("Enter train code: ")
+            tname = input("Enter train name: ")
+            seat = int(input("Enter number of seats: "))
+            booked = int(input("Enter number of booked seats: "))
+            depart_time = input("Enter departure time: ")
+            depart_place = input("Enter departure place: ")
+            available_seat = seat - booked
+            train_list.input_and_add_to_head(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
+
+        elif choice == '1.3':
+            print("Train List:")
+            train_list.display_data()
+
+        elif choice == '1.4':
+            filename = input("Enter file name to save train list: ")
+            train_list.save_data_to_file(filename)
+
+        elif choice == '1.5':
+            tcode_to_search = input("Enter the tcode to search: ")
+            train_list.search_by_tcode(tcode_to_search)
+
+        elif choice == '1.6':
+            tcode_to_delete = input("Enter the tcode to delete: ")
+            train_list.delete_by_tcode(tcode_to_delete)
+        # Implement other menu options for Train list
+
+        elif choice == '1.7':
+            train_list.sort_by_tcode()
+            print("Train list sorted by tcode.")
+
+
+        elif choice == '1.8':
+            k = int(input("Enter the position k: "))
+            tcode = input("Enter train code: ")
+            tname = input("Enter train name: ")
+            seat = int(input("Enter number of seats: "))
+            booked = int(input("Enter number of booked seats: "))
+            depart_time = input("Enter departure time: ")
+            depart_place = input("Enter departure place: ")
+            available_seat = seat - booked
+            train_list.add_after_position_k(k, tcode, tname, seat, booked, depart_time, depart_place, available_seat)
+
+        elif choice == '1.9':
+            xCode = input("Enter the tcode before which you want to delete the previous node: ")
+            train_list.delete_node_before_tcode(xCode)
+
+# //////////////////////////////////////////////////////////////////////////
+
+        elif choice == '2.1':
+            filename = input("Enter file name: ")
+            customer_list.load_data_from_file(filename)
+            display_customer_menu()
+        elif choice == '2.2':
+            ccode = input("Enter customer code: ")
+            cname = input("Enter customer name: ")
+            phone = input("Enter customer phone: ")
+            customer_list.input_and_add_to_end(ccode, cname, phone)
+        elif choice == '2.3':
+            customer_list.display_data()
+        elif choice == '2.4':
+            filename = input("Enter file name to save customer list: ")
+            customer_list.save_data_to_file(filename)
+        elif choice == '2.5':
+            ccode_to_search = input("Enter the ccode to search: ")
+            customer_list.search_by_ccode(ccode_to_search)
+        elif choice == '2.6':
+            ccode_to_delete = input("Enter the ccode to delete: ")
+            customer_list.delete_by_ccode(ccode_to_delete)
+# //////////////////////////////////////////////////////////////////////////
+
+        if choice == '3.1':
+            booking_list.input_data(train_list, customer_list)
+        elif choice == '3.2':
+            booking_list.display_data()
+        elif choice == '3.3':
+            booking_list.sort_by_tcode_ccode()
         else:
             print("Invalid choice. Please try again.")
 
