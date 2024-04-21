@@ -9,7 +9,6 @@ class TrainNode:
         self.available_seat = available_seat
         self.next = None
 
-
 class TrainLinkedList:
     def __init__(self):
         self.head = None
