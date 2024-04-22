@@ -1,3 +1,5 @@
+import os
+
 class TrainNode:
     def __init__(self, tcode, tname, seat, booked, depart_time, depart_place, available_seat):
         self.tcode = tcode
@@ -8,7 +10,17 @@ class TrainNode:
         self.depart_place = depart_place
         self.available_seat = available_seat
         self.next = None
-
+        
+    def to_dict(self):
+        return {
+            'tcode': self.tcode,
+            'tname': self.tname,
+            'seat': self.seat,
+            'booked': self.booked,
+            'depart_time': self.depart_time,
+            'depart_place': self.depart_place,
+            'available_seat': self.available_seat
+        }
 
 class TrainLinkedList:
     def __init__(self):
@@ -16,7 +28,8 @@ class TrainLinkedList:
 
     def load_data_from_file(self, filename):
         try:
-            with open(filename, 'r') as file:
+            directory = "data"
+            with open(f"{directory}/{filename}", 'r') as file:
                 for line in file:
                     data = line.strip().split(" | ")
                     tcode = data[0]
@@ -38,43 +51,61 @@ class TrainLinkedList:
         except FileNotFoundError:
             print("File not found.")
     
-    def input_and_add_to_head(self, tcode, tname, seat, booked, depart_time, depart_place, available_seat):
-        new_node = TrainNode(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
-        new_node.next = self.head
-        self.head = new_node
+    def input_and_add_to_head(self,  train_node):
+        train_node.next = self.head
+        self.head = train_node
         print("Train added successfully.")
     
     def display_data(self):
-        print("tcode|Train_name|Seat|booked|depart_time|depart_place|available_seat")
-        print("-------------------------------------------------------------------")
+        data = []
         current = self.head
         while current:
-            print(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}")
+            train_info = {
+                "tcode": current.tcode,
+                "train_name": current.tname,
+                "seat": current.seat,
+                "booked": current.booked,
+                "depart_time": current.depart_time,
+                "depart_place": current.depart_place,
+                "available_seat": current.available_seat
+            }
+            data.append(train_info)
             current = current.next
+        return data
+
     
-    def save_data_to_file(self, filename):
+    def save_data_to_file(self):
         try:
-            with open(filename, 'w') as file:
+            with open("train.txt", 'w') as file:
                 current = self.head
                 while current:
                     file.write(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}\n")
                     current = current.next
-            print("Danh sách tàu đã được lưu vào tệp thành công.")
         except Exception as e:
-            print(f"Lỗi khi lưu tệp: {e}")
+            raise RuntimeError(f"Error while saving file: {e}")
+    
+
+    def save_data_to_file(self, filename):
+        try:
+            directory = "data"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            
+            with open(f"{directory}/{filename}", 'w') as file:
+                current = self.head
+                while current:
+                    file.write(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}\n")
+                    current = current.next
+        except Exception as e:
+            raise RuntimeError(f"Error while saving file: {e}")
 
     def search_by_tcode(self, tcode):
         current = self.head
-        found = False
         while current:
             if current.tcode == tcode:
-                print("Train found:")
-                print(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}")
-                found = True
-                break
+                return current
             current = current.next
-        if not found:
-            print("Train not found.")
+        return None
     
     def delete_by_tcode(self, tcode):
         current = self.head
@@ -119,8 +150,7 @@ class TrainLinkedList:
                 prev, current = current, current.next
 
 
-    def add_after_position_k(self, k, tcode, tname, seat, booked, depart_time, depart_place, available_seat):
-        new_node = TrainNode(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
+    def add_after_position_k(self, k, new_node):
         count = 0
         current = self.head
         prev = None
@@ -136,7 +166,7 @@ class TrainLinkedList:
                 prev.next = new_node
             else:
                 self.head = new_node
-            print("Node replaced at position k successfully.")
+            print("Node inserted after position k successfully.")
         else:
             print("Position k not found.")
 
