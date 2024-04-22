@@ -115,16 +115,35 @@ async def train_booking_server(websocket, path):
                 await websocket.send(json.dumps(alert))
     # //////////////////////////////////////////////////////////////////////////
 
-            # elif choice == '2.1':
-            #     filename = input("Enter file name: ")
-            #     customer_list.load_data_from_file(filename)
-            # elif choice == '2.2':
-            #     ccode = input("Enter customer code: ")
-            #     cname = input("Enter customer name: ")
-            #     phone = input("Enter customer phone: ")
-            #     customer_list.input_and_add_to_end(ccode, cname, phone)
-            # elif choice == '2.3':
-            #     customer_list.display_data()
+            elif choice == '2.1':
+                await websocket.send('Input customer file path')
+                filename = await websocket.recv()
+                customer_list.load_data_customer_from_file(filename)
+                
+                alert = {
+                    "type": "alert",
+                    "message": "Load data from " + filename + " successfully"
+                }
+                await websocket.send(json.dumps(alert))
+                
+            elif choice == '2.2':
+                await websocket.send("Input train data")
+                cus_data_json = await websocket.recv()
+                cus_data = json.loads(cus_data_json)
+                new_cus = train_booking.CustomerNode(cus_data['ccode'], cus_data['name'], cus_data['phone'])
+                customer_list.input_and_add_to_end(new_cus)
+                
+                alert = {
+                    "type": "alert",
+                    "message": "Insert customer data successfully"
+                }
+                await websocket.send(json.dumps(alert))
+                
+            elif choice == '2.3':
+                payload = customer_list.display_customer_data()
+                print(payload)
+                await websocket.send(json.dumps(payload))
+                
             # elif choice == '2.4':
             #     filename = input("Enter file name to save customer list: ")
             #     customer_list.save_data_to_file(filename)

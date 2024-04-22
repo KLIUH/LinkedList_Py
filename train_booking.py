@@ -208,10 +208,11 @@ class CustomerNode:
 class CustomerLinkedList:
     def __init__(self):
         self.head = None
-
-    def load_data_from_file(self, filename):
+        
+    def load_data_customer_from_file(self, filename):
         try:
-            with open(filename, 'r') as file:
+            directory = "data"
+            with open(f"{directory}/{filename}", 'r') as file:
                 for line in file:
                     data = line.strip().split(" | ")
                     ccode = data[0]
@@ -227,24 +228,31 @@ class CustomerLinkedList:
                         current.next = new_node
             print("Data loaded successfully.")
         except FileNotFoundError:
-            print("File not found.")
+            print("File not found vllslsl.")
     
-    def input_and_add_to_end(self, ccode, name, phone):
-        new_node = CustomerNode(ccode, name, phone)
+    def input_and_add_to_end(self, new_node):
         if not self.head:  # Nếu danh sách rỗng
             self.head = new_node
         else:
-            new_node.next = self.head  # Node mới trỏ tới node hiện tại của danh sách
-            self.head = new_node  # Cập nhật con trỏ head để trỏ tới node mới thêm vào
+            current = self.head
+            while current.next:  # Duyệt đến phần tử cuối cùng trong danh sách
+                current = current.next
+            current.next = new_node  # Thêm node mới vào cuối danh sách
         print("Customer added successfully.")
 
 
-    def display_data(self):
-        print("ccode | name | phone")
+    def display_customer_data(self):
+        customer_data = []  # Danh sách để lưu trữ các CustomerNode
         current = self.head
         while current:
-            print(f"{current.ccode} | {current.name} | {current.phone}")
+            customer_data.append({
+                'ccode': current.ccode,
+                'name': current.name,
+                'phone': current.phone
+            })
             current = current.next
+        return customer_data
+
     
     def save_data_to_file(self, filename):
         try:

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="d-flex align-items-center w-100 justify-content-between">
+            <h2 class="mr-3">Customer List</h2>
+
+            <!-- Dropdown menu -->
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Action
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="#" id="loadFromFile">2.1 Load data from file</a></li>
+                    <li><a class="dropdown-item" href="#" id="openInputModal">2.2 Input & add to the end</a></li>
+                    <li><a class="dropdown-item" href="#" id="openDisplayDataModal">2.3 Display data</a></li>
+                    <li><a class="dropdown-item" href="#" id="openSaveFile">2.4 Save customer list to file</a></li>
+                    <li><a class="dropdown-item" href="#" id="openSearchModal">2.5 Search by ccode</a></li>
+                    <li><a class="dropdown-item" href="#" id="openDeleteModal">2.6 Delete by ccode</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Train List -->
+        <table class="table mt-3" id="customerListTable">
+            <thead>
+                <tr>
+                    <th scope="col">CCocde</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dữ liệu sẽ được thêm vào đây -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal Load Data-->
+    <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fileModalLabel">Choose File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- File input -->
+                    <input type="file" id="fileInput">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitFile()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal input data -->
+    <div class="modal fade" id="inputModal" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputModalLabel">Input Customer Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to input data -->
+                    <form id="inputForm">
+                        <div class="mb-3">
+                            <label for="ccode" class="form-label">Ccode</label>
+                            <input type="text" class="form-control" id="ccode" name="ccode">
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="phone" name="phone">
+                        </div>
+                        
+                        <!-- Add other input fields for Seat, Booked, Depart Time, Depart Place, Available Seat -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="submitInput">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/socketClient.js"></script>
+    <script src="../js/cus.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

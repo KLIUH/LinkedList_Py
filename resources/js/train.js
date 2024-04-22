@@ -24,13 +24,12 @@ document.getElementById("openInputModal").addEventListener("click", function (ev
     // Show the modal
     var inputModal = new bootstrap.Modal(document.getElementById('inputModal'));
     inputModal.show();
-    socket.send('1.2')
 });
 
 // Add click event listener to Submit button in input modal
 document.getElementById("submitInput").addEventListener("click", function (event) {
     // Get form data
-    const formData = new FormData(document.getElementById("inputForm"));
+    socket.send('1.2')
 
     const tcode = document.getElementById("tcode").value;
     const trainName = document.getElementById("trainName").value;
@@ -64,11 +63,11 @@ document.getElementById("openSearchModal").addEventListener("click", function (e
     // Show the modal
     var searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
     searchModal.show();
-    socket.send('1.5')
 });
 
 // Add click event listener to Search button in search modal
 document.getElementById("submitSearch").addEventListener("click", function (event) {
+    socket.send('1.5')
     // Get tcode input value
     var tcode = document.getElementById("searchTcode").value;
 
@@ -85,11 +84,11 @@ document.getElementById("openDeleteModal").addEventListener("click", function (e
     // Show the modal
     var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
     deleteModal.show();
-    socket.send('1.6')
 });
 
 // Add click event listener to Delete button in delete modal
 document.getElementById("submitDelete").addEventListener("click", function (event) {
+    socket.send('1.6')
     // Get tcode input value
     var tcode = document.getElementById("deleteTcode").value;
 
@@ -107,11 +106,11 @@ document.getElementById("openAddAfterModal").addEventListener("click", function 
     // Show the modal
     var addAfterModal = new bootstrap.Modal(document.getElementById('addAfterModal'));
     addAfterModal.show();
-    socket.send('1.8')
 });
 
 // Add click event listener to Submit button in add after modal
 document.getElementById("submitAddAfter").addEventListener("click", function (event) {
+    socket.send('1.8')
     // Get input values
     const positionK = document.getElementById("positionK").value;
     const tcode = document.getElementById("tcodeK").value;
