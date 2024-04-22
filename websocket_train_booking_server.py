@@ -44,12 +44,17 @@ async def train_booking_server(websocket, path):
                 train_data_json = await websocket.recv()
                 train_data = json.loads(train_data_json)
                 new_train = train_booking.TrainNode(train_data['tcode'], train_data['tname'], int(train_data['seat']), int(train_data['booked']), train_data['depart_time'], train_data['depart_place'], int(train_data['available_seat']))
-                shared_data.train_list.input_and_add_to_head(new_train)
+                rs = shared_data.train_list.input_and_add_to_head(new_train)
                 
                 alert = {
                     "type": "success",
                     "message": "Insert train data successfully"
                 }
+                if rs == False:
+                    alert = {
+                        "type": "danger",
+                        "message": "Insert train data fail"
+                    }
                 await send_data_to_clients(alert)
 
             elif choice == '1.3':

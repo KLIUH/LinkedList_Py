@@ -26,6 +26,14 @@ class TrainLinkedList:
     def __init__(self):
         self.head = None
 
+    def is_tcode_unique(self, tcode):
+        current = self.head
+        while current:
+            if current.tcode == tcode:
+                return False  # Trả về False nếu tcode đã tồn tại trong danh sách
+            current = current.next
+        return True  # Trả về True nếu tcode là duy nhất
+
     def load_data_from_file(self, filename):
         try:
             directory = "data"
@@ -51,10 +59,58 @@ class TrainLinkedList:
         except FileNotFoundError:
             print("File not found.")
     
+    def validate_train_node(self, train_node):
+        errors = []
+
+        # Check if train_node is None
+        if not train_node:
+            errors.append("Invalid train node. It cannot be None.")
+        else:
+            # Check if tcode is a non-empty string
+            if not train_node.tcode or not isinstance(train_node.tcode, str):
+                errors.append("Invalid tcode. It should be a non-empty string.")
+
+            if self.is_tcode_unique(train_node.tcode):
+                errors.append("Invalid tcode. This tcode apperanced in system.")
+            
+            # Check if tname is a non-empty string
+            if not train_node.tname or not isinstance(train_node.tname, str):
+                errors.append("Invalid tname. It should be a non-empty string.")
+
+            # Check if seat is a positive integer
+            if not isinstance(train_node.seat, int) or train_node.seat <= 0:
+                errors.append("Invalid seat. It should be a positive integer.")
+
+            # Check if booked is an integer within the range [0, seat]
+            if not isinstance(train_node.booked, int) or train_node.booked < 0 or train_node.booked > train_node.seat:
+                errors.append("Invalid booked. It should be an integer within the range [0, seat].")
+
+            # Check if depart_time is a non-negative float
+            if not isinstance(train_node.depart_time, (int, float)) or train_node.depart_time < 0:
+                errors.append("Invalid depart_time. It should be a non-negative float.")
+
+            # Check if depart_place is a non-empty string
+            if not train_node.depart_place or not isinstance(train_node.depart_place, str):
+                errors.append("Invalid depart_place. It should be a non-empty string.")
+
+            # Check if available_seat is a non-negative integer
+            if not isinstance(train_node.available_seat, int) or train_node.available_seat < 0:
+                errors.append("Invalid available_seat. It should be a non-negative integer.")
+
+        return errors
+
+    
     def input_and_add_to_head(self,  train_node):
-        train_node.next = self.head
-        self.head = train_node
-        print("Train added successfully.")
+        validation_errors = self.validate_train_node(train_node)
+        if not validation_errors:
+            train_node.next = self.head
+            self.head = train_node
+            print("Train added successfully.")
+            return True
+        else:
+            for err in validation_errors:
+                print(err)
+            return False
     
     def display_data(self):
         data = []
@@ -414,12 +470,15 @@ class BookingLinkedList:
     def is_valid_booking(self, train_list, customer_list, booking_node):
         train = train_list.search_by_tcode(booking_node.tcode)
         customer = customer_list.search_by_ccode(booking_node.ccode)
-        conditionSeat = int(train.booked) + int(booking_node.num_seats)
         if not train or not customer:
             return "tcode or ccode not found."
 
-        if conditionSeat > train.seat:
+        if int(train.booked) == int(train.seat):
             return "The train is exhausted."
+        
+        conditionSeat = int(train.booked) + int(booking_node.num_seats)
+        if conditionSeat > int(train.seat):
+            return "Not enough seat"
 
         current = self.head
         while current:
