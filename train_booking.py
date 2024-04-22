@@ -1,3 +1,5 @@
+import os
+
 class TrainNode:
     def __init__(self, tcode, tname, seat, booked, depart_time, depart_place, available_seat):
         self.tcode = tcode
@@ -8,7 +10,17 @@ class TrainNode:
         self.depart_place = depart_place
         self.available_seat = available_seat
         self.next = None
-
+        
+    def to_dict(self):
+        return {
+            'tcode': self.tcode,
+            'tname': self.tname,
+            'seat': self.seat,
+            'booked': self.booked,
+            'depart_time': self.depart_time,
+            'depart_place': self.depart_place,
+            'available_seat': self.available_seat
+        }
 
 class TrainLinkedList:
     def __init__(self):
@@ -16,7 +28,8 @@ class TrainLinkedList:
 
     def load_data_from_file(self, filename):
         try:
-            with open(filename, 'r') as file:
+            directory = "data"
+            with open(f"{directory}/{filename}", 'r') as file:
                 for line in file:
                     data = line.strip().split(" | ")
                     tcode = data[0]
@@ -38,43 +51,61 @@ class TrainLinkedList:
         except FileNotFoundError:
             print("File not found.")
     
-    def input_and_add_to_head(self, tcode, tname, seat, booked, depart_time, depart_place, available_seat):
-        new_node = TrainNode(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
-        new_node.next = self.head
-        self.head = new_node
+    def input_and_add_to_head(self,  train_node):
+        train_node.next = self.head
+        self.head = train_node
         print("Train added successfully.")
     
     def display_data(self):
-        print("tcode|Train_name|Seat|booked|depart_time|depart_place|available_seat")
-        print("-------------------------------------------------------------------")
+        data = []
         current = self.head
         while current:
-            print(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}")
+            train_info = {
+                "tcode": current.tcode,
+                "tname": current.tname,
+                "seat": current.seat,
+                "booked": current.booked,
+                "depart_time": current.depart_time,
+                "depart_place": current.depart_place,
+                "available_seat": current.available_seat
+            }
+            data.append(train_info)
             current = current.next
+        return data
+
     
-    def save_data_to_file(self, filename):
+    def save_data_to_file(self):
         try:
-            with open(filename, 'w') as file:
+            with open("train.txt", 'w') as file:
                 current = self.head
                 while current:
                     file.write(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}\n")
                     current = current.next
-            print("Danh sách tàu đã được lưu vào tệp thành công.")
         except Exception as e:
-            print(f"Lỗi khi lưu tệp: {e}")
+            raise RuntimeError(f"Error while saving file: {e}")
+    
+
+    def save_data_to_file(self, filename):
+        try:
+            directory = "data"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            
+            with open(f"{directory}/{filename}", 'w') as file:
+                current = self.head
+                while current:
+                    file.write(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}\n")
+                    current = current.next
+        except Exception as e:
+            raise RuntimeError(f"Error while saving file: {e}")
 
     def search_by_tcode(self, tcode):
         current = self.head
-        found = False
         while current:
             if current.tcode == tcode:
-                print("Train found:")
-                print(f"{current.tcode} | {current.tname} | {current.seat} | {current.booked} | {current.depart_time} | {current.depart_place} | {current.available_seat}")
-                found = True
-                break
+                return current
             current = current.next
-        if not found:
-            print("Train not found.")
+        return None
     
     def delete_by_tcode(self, tcode):
         current = self.head
@@ -119,8 +150,7 @@ class TrainLinkedList:
                 prev, current = current, current.next
 
 
-    def add_after_position_k(self, k, tcode, tname, seat, booked, depart_time, depart_place, available_seat):
-        new_node = TrainNode(tcode, tname, seat, booked, depart_time, depart_place, available_seat)
+    def add_after_position_k(self, k, new_node):
         count = 0
         current = self.head
         prev = None
@@ -136,7 +166,7 @@ class TrainLinkedList:
                 prev.next = new_node
             else:
                 self.head = new_node
-            print("Node replaced at position k successfully.")
+            print("Node inserted after position k successfully.")
         else:
             print("Position k not found.")
 
@@ -174,14 +204,22 @@ class CustomerNode:
         self.name = name
         self.phone = phone
         self.next = None
+        
+    def to_dict(self):
+        return {
+            'ccode': self.ccode,
+            'name': self.name,
+            'phone': self.phone
+        }
 
 class CustomerLinkedList:
     def __init__(self):
         self.head = None
-
-    def load_data_from_file(self, filename):
+        
+    def load_data_customer_from_file(self, filename):
         try:
-            with open(filename, 'r') as file:
+            directory = "data"
+            with open(f"{directory}/{filename}", 'r') as file:
                 for line in file:
                     data = line.strip().split(" | ")
                     ccode = data[0]
@@ -197,28 +235,39 @@ class CustomerLinkedList:
                         current.next = new_node
             print("Data loaded successfully.")
         except FileNotFoundError:
-            print("File not found.")
+            print("File not found vllslsl.")
     
-    def input_and_add_to_end(self, ccode, name, phone):
-        new_node = CustomerNode(ccode, name, phone)
+    def input_and_add_to_end(self, new_node):
         if not self.head:  # Nếu danh sách rỗng
             self.head = new_node
         else:
-            new_node.next = self.head  # Node mới trỏ tới node hiện tại của danh sách
-            self.head = new_node  # Cập nhật con trỏ head để trỏ tới node mới thêm vào
+            current = self.head
+            while current.next:  # Duyệt đến phần tử cuối cùng trong danh sách
+                current = current.next
+            current.next = new_node  # Thêm node mới vào cuối danh sách
         print("Customer added successfully.")
 
 
-    def display_data(self):
-        print("ccode | name | phone")
+    def display_customer_data(self):
+        customer_data = []  # Danh sách để lưu trữ các CustomerNode
         current = self.head
         while current:
-            print(f"{current.ccode} | {current.name} | {current.phone}")
+            customer_data.append({
+                'ccode': current.ccode,
+                'name': current.name,
+                'phone': current.phone
+            })
             current = current.next
+        return customer_data
+
     
-    def save_data_to_file(self, filename):
+    def save_data_cus_to_file(self, filename):
         try:
-            with open(filename, 'w') as file:  # Mở file để ghi (mode 'w')
+            directory = "data"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            
+            with open(f"{directory}/{filename}", 'w') as file:  # Mở file để ghi (mode 'w')
                 current = self.head
                 while current:
                     file.write(f"{current.ccode} | {current.name} | {current.phone}\n")
@@ -229,16 +278,11 @@ class CustomerLinkedList:
 
     def search_by_ccode(self, ccode):
         current = self.head
-        found = False
         while current:
             if current.ccode == ccode:
-                print("Customer found:")
-                print(f"{current.ccode} | {current.name} | {current.phone}")
-                found = True
-                break
+                return current  # Trả về đối tượng CustomerNode nếu tìm thấy
             current = current.next
-        if not found:
-            print("Customer not found.")
+        return None  # Trả về None nếu không tìm thấy khách hàng
 
     def delete_by_ccode(self, ccode):
         current = self.head
@@ -295,18 +339,15 @@ class BookingLinkedList:
     def __init__(self):
         self.head = None
 
-    def input_data(self, train_list, customer_list):
-        tcode = input("Enter train code: ")
-        ccode = input("Enter customer code: ")
-        num_seats = int(input("Enter number of seats to be booked: "))
-
+    def input_data(self, train_list, customer_list, booking_node):
         # Kiểm tra tính hợp lệ của tcode và ccode
-        if not self.is_valid_booking(train_list, customer_list, tcode, ccode, num_seats):
+        if not self.is_valid_booking(train_list, customer_list, booking_node) == "":
             print("Data is not accepted.")
+            print(self.is_valid_booking(train_list, customer_list, booking_node))
             return
 
         # Thêm dữ liệu vào danh sách đặt chỗ
-        new_booking = BookingNode(tcode, ccode, num_seats)
+        new_booking = BookingNode(booking_node.tcode, booking_node.ccode, booking_node.num_seats)
         if not self.head:
             self.head = new_booking
         else:
@@ -317,10 +358,34 @@ class BookingLinkedList:
         print("Booking data added successfully.")
 
     def display_data(self):
+        # def display_data(self):
+        # data = []
+        # current = self.head
+        # while current:
+        #     train_info = {
+        #         "tcode": current.tcode,
+        #         "tname": current.tname,
+        #         "seat": current.seat,
+        #         "booked": current.booked,
+        #         "depart_time": current.depart_time,
+        #         "depart_place": current.depart_place,
+        #         "available_seat": current.available_seat
+        #     }
+        #     data.append(train_info)
+        #     current = current.next
+        # return data
+        data = []
         current = self.head
         while current:
-            print(f"{current.tcode} | {current.ccode} | {current.num_seats}")
+            booking_info = {
+                "tcode": current.tcode,
+                "ccode": current.ccode,
+                "num_seats": current.num_seats
+            }
+            
+            data.append(booking_info)
             current = current.next
+        return data
 
     def sort_by_tcode_ccode(self):
         if not self.head or not self.head.next:
@@ -346,26 +411,23 @@ class BookingLinkedList:
         current.next = new_node
         return sorted_head
 
-    def is_valid_booking(self, train_list, customer_list, tcode, ccode, num_seats):
-        train = train_list.search_by_tcode(tcode)
-        customer = customer_list.search_by_ccode(ccode)
-
+    def is_valid_booking(self, train_list, customer_list, booking_node):
+        train = train_list.search_by_tcode(booking_node.tcode)
+        customer = customer_list.search_by_ccode(booking_node.ccode)
+        conditionSeat = int(train.booked) + int(booking_node.num_seats)
         if not train or not customer:
-            print("tcode or ccode not found.")
-            return False
+            return "tcode or ccode not found."
 
-        if train.booked + num_seats > train.seat:
-            print("The train is exhausted.")
-            return False
+        if conditionSeat > train.seat:
+            return "The train is exhausted."
 
         current = self.head
         while current:
-            if current.tcode == tcode and current.ccode == ccode:
-                print("tcode and ccode already exist in the booking list.")
-                return False
+            if current.tcode == booking_node.tcode and current.ccode == booking_node.ccode:
+                return "tcode and ccode already exist in the booking list."
             current = current.next
 
-        return True
+        return ""
 
 
 # ////////////////////////////////////////////////////////////////////////////////////////////////
