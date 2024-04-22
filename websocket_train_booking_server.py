@@ -144,15 +144,40 @@ async def train_booking_server(websocket, path):
                 print(payload)
                 await websocket.send(json.dumps(payload))
                 
-            # elif choice == '2.4':
-            #     filename = input("Enter file name to save customer list: ")
-            #     customer_list.save_data_to_file(filename)
-            # elif choice == '2.5':
-            #     ccode_to_search = input("Enter the ccode to search: ")
-            #     customer_list.search_by_ccode(ccode_to_search)
-            # elif choice == '2.6':
-            #     ccode_to_delete = input("Enter the ccode to delete: ")
-            #     customer_list.delete_by_ccode(ccode_to_delete)
+            elif choice == '2.4':
+                await websocket.send("wait for inputing file name")
+                filename = await websocket.recv()
+                customer_list.save_data_cus_to_file(filename)
+                
+                alert = {
+                    "type": "alert",
+                    "message": "Save into " + filename + " successfully"
+                }
+                await websocket.send(json.dumps(alert))
+                
+            elif choice == '2.5':
+                await websocket.send("Input tcode")
+                ccode_to_search = await websocket.recv()
+                print(ccode_to_search)
+                arr = []
+                rs = customer_list.search_by_ccode(ccode_to_search)
+                print(rs)
+                if rs is not None:
+                    arr.append(rs.to_dict())
+                print(arr)
+                await websocket.send(json.dumps(arr))
+                
+            elif choice == '2.6':
+                await websocket.send("Input tcode")
+                ccode_to_delete = await websocket.recv()
+                customer_list.delete_by_ccode(ccode_to_delete)
+                
+                alert = {
+                    "type": "alert",
+                    "message": "Delete train " + ccode_to_delete + " successfully"
+                }
+                await websocket.send(json.dumps(alert))
+                
     # //////////////////////////////////////////////////////////////////////////
 
             # if choice == '3.1':

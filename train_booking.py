@@ -204,6 +204,13 @@ class CustomerNode:
         self.name = name
         self.phone = phone
         self.next = None
+        
+    def to_dict(self):
+        return {
+            'ccode': self.ccode,
+            'name': self.name,
+            'phone': self.phone
+        }
 
 class CustomerLinkedList:
     def __init__(self):
@@ -254,9 +261,13 @@ class CustomerLinkedList:
         return customer_data
 
     
-    def save_data_to_file(self, filename):
+    def save_data_cus_to_file(self, filename):
         try:
-            with open(filename, 'w') as file:  # Mở file để ghi (mode 'w')
+            directory = "data"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            
+            with open(f"{directory}/{filename}", 'w') as file:  # Mở file để ghi (mode 'w')
                 current = self.head
                 while current:
                     file.write(f"{current.ccode} | {current.name} | {current.phone}\n")
@@ -267,16 +278,11 @@ class CustomerLinkedList:
 
     def search_by_ccode(self, ccode):
         current = self.head
-        found = False
         while current:
             if current.ccode == ccode:
-                print("Customer found:")
-                print(f"{current.ccode} | {current.name} | {current.phone}")
-                found = True
-                break
+                return current  # Trả về đối tượng CustomerNode nếu tìm thấy
             current = current.next
-        if not found:
-            print("Customer not found.")
+        return None  # Trả về None nếu không tìm thấy khách hàng
 
     def delete_by_ccode(self, ccode):
         current = self.head

@@ -186,6 +186,7 @@ document.getElementById("openDisplayDataModal").addEventListener("click", functi
 
     socket.send('1.3')
 });
+
 document.getElementById("openSaveFile").addEventListener("click", function() {
     // Mở modal
     var saveFileModal = new bootstrap.Modal(document.getElementById('saveFileModal'));

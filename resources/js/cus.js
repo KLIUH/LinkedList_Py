@@ -66,3 +66,62 @@ document.getElementById("submitInput").addEventListener("click", function (event
     console.log(jsonData);
     socket.send(jsonData)
 });
+
+document.getElementById("openSaveFile").addEventListener("click", function() {
+    // Mở modal
+    var saveFileModal = new bootstrap.Modal(document.getElementById('saveFileModal'));
+    saveFileModal.show();
+});
+
+// Xử lý khi người dùng nhấn vào nút "Save" trong modal
+document.getElementById("saveToFileBtn").addEventListener("click", function() {
+    socket.send('2.4')
+    const fileName = document.getElementById("fileName").value;
+    // Xử lý lưu file ở đây
+    console.log("File name:", fileName);
+    // Đóng modal sau khi lưu xong
+    const saveFileModal = bootstrap.Modal.getInstance(document.getElementById('saveFileModal'));
+    saveFileModal.hide();
+    socket.send(fileName)
+});
+
+document.getElementById("openSearchModal").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default action of link
+
+    // Show the modal
+    var searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
+    searchModal.show();
+});
+
+// Add click event listener to Search button in search modal
+document.getElementById("submitSearch").addEventListener("click", function (event) {
+    socket.send('2.5')
+    // Get tcode input value
+    var ccode = document.getElementById("searchCcode").value;
+
+    // Close the modal
+    var searchModal = bootstrap.Modal.getInstance(document.getElementById('searchModal'));
+    searchModal.hide();
+    socket.send(ccode)
+});
+
+document.getElementById("openDeleteModal").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default action of link
+
+    // Show the modal
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+});
+
+// Add click event listener to Delete button in delete modal
+document.getElementById("submitDelete").addEventListener("click", function (event) {
+    socket.send('2.6')
+    // Get tcode input value
+    var ccode = document.getElementById("deleteCcode").value;
+
+
+    // Close the modal
+    var deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+    deleteModal.hide();
+    socket.send(ccode)
+});
