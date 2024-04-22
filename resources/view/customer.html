@@ -9,12 +9,19 @@
 </head>
 
 <body>
+    <div class="notice"></div>
     <div class="container mt-5">
         <div class="d-flex align-items-center w-100 justify-content-between">
             <h2 class="mr-3">Customer List</h2>
 
             <!-- Dropdown menu -->
             <div class="dropdown">
+                <a href="./train-booking.html" target="_blank" rel="noopener noreferrer" class="btn btn-success"
+                    id="customerButton">Booking</a>
+                <a href="./train.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary"
+                    id="trainButton">Train</a>
+
+
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     Action
@@ -88,7 +95,7 @@
                             <label for="phone" class="form-label">Phone</label>
                             <input type="text" class="form-control" id="phone" name="phone">
                         </div>
-                        
+
                         <!-- Add other input fields for Seat, Booked, Depart Time, Depart Place, Available Seat -->
                     </form>
                 </div>

@@ -18,6 +18,7 @@ function submitFile() {
 }
 
 function populateTable(data) {
+    localStorage.setItem('customers', JSON.stringify(data))
     var tableBody = document.getElementById("customerListTable").getElementsByTagName('tbody')[0];
     tableBody.innerHTML = ""; // Clear existing data
 

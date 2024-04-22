@@ -62,7 +62,7 @@ class TrainLinkedList:
         while current:
             train_info = {
                 "tcode": current.tcode,
-                "train_name": current.tname,
+                "tname": current.tname,
                 "seat": current.seat,
                 "booked": current.booked,
                 "depart_time": current.depart_time,
@@ -339,18 +339,15 @@ class BookingLinkedList:
     def __init__(self):
         self.head = None
 
-    def input_data(self, train_list, customer_list):
-        tcode = input("Enter train code: ")
-        ccode = input("Enter customer code: ")
-        num_seats = int(input("Enter number of seats to be booked: "))
-
+    def input_data(self, train_list, customer_list, booking_node):
         # Kiểm tra tính hợp lệ của tcode và ccode
-        if not self.is_valid_booking(train_list, customer_list, tcode, ccode, num_seats):
+        if not self.is_valid_booking(train_list, customer_list, booking_node) == "":
             print("Data is not accepted.")
+            print(self.is_valid_booking(train_list, customer_list, booking_node))
             return
 
         # Thêm dữ liệu vào danh sách đặt chỗ
-        new_booking = BookingNode(tcode, ccode, num_seats)
+        new_booking = BookingNode(booking_node.tcode, booking_node.ccode, booking_node.num_seats)
         if not self.head:
             self.head = new_booking
         else:
@@ -361,10 +358,34 @@ class BookingLinkedList:
         print("Booking data added successfully.")
 
     def display_data(self):
+        # def display_data(self):
+        # data = []
+        # current = self.head
+        # while current:
+        #     train_info = {
+        #         "tcode": current.tcode,
+        #         "tname": current.tname,
+        #         "seat": current.seat,
+        #         "booked": current.booked,
+        #         "depart_time": current.depart_time,
+        #         "depart_place": current.depart_place,
+        #         "available_seat": current.available_seat
+        #     }
+        #     data.append(train_info)
+        #     current = current.next
+        # return data
+        data = []
         current = self.head
         while current:
-            print(f"{current.tcode} | {current.ccode} | {current.num_seats}")
+            booking_info = {
+                "tcode": current.tcode,
+                "ccode": current.ccode,
+                "num_seats": current.num_seats
+            }
+            
+            data.append(booking_info)
             current = current.next
+        return data
 
     def sort_by_tcode_ccode(self):
         if not self.head or not self.head.next:
@@ -390,26 +411,23 @@ class BookingLinkedList:
         current.next = new_node
         return sorted_head
 
-    def is_valid_booking(self, train_list, customer_list, tcode, ccode, num_seats):
-        train = train_list.search_by_tcode(tcode)
-        customer = customer_list.search_by_ccode(ccode)
-
+    def is_valid_booking(self, train_list, customer_list, booking_node):
+        train = train_list.search_by_tcode(booking_node.tcode)
+        customer = customer_list.search_by_ccode(booking_node.ccode)
+        conditionSeat = int(train.booked) + int(booking_node.num_seats)
         if not train or not customer:
-            print("tcode or ccode not found.")
-            return False
+            return "tcode or ccode not found."
 
-        if train.booked + num_seats > train.seat:
-            print("The train is exhausted.")
-            return False
+        if conditionSeat > train.seat:
+            return "The train is exhausted."
 
         current = self.head
         while current:
-            if current.tcode == tcode and current.ccode == ccode:
-                print("tcode and ccode already exist in the booking list.")
-                return False
+            if current.tcode == booking_node.tcode and current.ccode == booking_node.ccode:
+                return "tcode and ccode already exist in the booking list."
             current = current.next
 
-        return True
+        return ""
 
 
 # ////////////////////////////////////////////////////////////////////////////////////////////////

@@ -3,193 +3,229 @@ import asyncio
 import train_booking
 import json
 
+class SharedData:
+    def __init__(self):
+        self.train_list = train_booking.TrainLinkedList()
+        self.customer_list = train_booking.CustomerLinkedList()
+        self.booking_list = train_booking.BookingLinkedList()
+
+shared_data = SharedData()
+connected_clients = []
+
+async def send_data_to_clients(data):
+    for client in connected_clients:
+        try:
+            await client.send(json.dumps(data))
+        except:
+            connected_clients.remove(client)
+
 async def train_booking_server(websocket, path): 
-    train_list = train_booking.TrainLinkedList()
-    customer_list = train_booking.CustomerLinkedList()
-    booking_list = train_booking.BookingLinkedList()
+    global shared_data
+    
+    connected_clients.append(websocket)
     
     while True:
         try:
             print(f"Connected on ws://{websocket.remote_address[0]}:{websocket.remote_address[1]}")
             choice = await websocket.recv()
-            print(choice)
             
             if choice == '1.1':
                 await websocket.send('Input file path')
                 filename = await websocket.recv()
-                train_list.load_data_from_file(filename)
+                shared_data.train_list.load_data_from_file(filename)
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Load data from " + filename + " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
                 
             elif choice == '1.2':
                 await websocket.send("Input train data")
                 train_data_json = await websocket.recv()
                 train_data = json.loads(train_data_json)
                 new_train = train_booking.TrainNode(train_data['tcode'], train_data['tname'], int(train_data['seat']), int(train_data['booked']), train_data['depart_time'], train_data['depart_place'], int(train_data['available_seat']))
-                train_list.input_and_add_to_head(new_train)
+                shared_data.train_list.input_and_add_to_head(new_train)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Insert train data successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
 
             elif choice == '1.3':
-                payload = train_list.display_data()
-                print(payload)
+                payload = shared_data.train_list.display_data()
                 await websocket.send(json.dumps(payload))
 
             elif choice == '1.4':
                 await websocket.send("wait for inputing file name")
                 file_path = await websocket.recv()
-                train_list.save_data_to_file(file_path)
+                shared_data.train_list.save_data_to_file(file_path)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Save into " + file_path + " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
 
             elif choice == '1.5':
                 await websocket.send("Input tcode")
                 tcode_to_search = await websocket.recv()
-                print(tcode_to_search)
                 arr = []
-                rs = train_list.search_by_tcode(tcode_to_search)
-                print(rs)
+                rs = shared_data.train_list.search_by_tcode(tcode_to_search)
                 if rs is not None:
                     arr.append(rs.to_dict())
-                print(arr)
                 await websocket.send(json.dumps(arr))
 
             elif choice == '1.6':
                 await websocket.send("Input tcode")
                 tcode_to_delete = await websocket.recv()
-                train_list.delete_by_tcode(tcode_to_delete)
+                shared_data.train_list.delete_by_tcode(tcode_to_delete)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Delete train " + tcode_to_delete + " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
                 
             # Implement other menu options for Train list
 
             elif choice == '1.7':
-                train_list.sort_by_tcode()
+                shared_data.train_list.sort_by_tcode()
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Train list was sorted"
                 }
-                await websocket.send(json.dumps(alert))
-
+                await send_data_to_clients(alert)
 
             elif choice == '1.8':
                 await websocket.send("Input train data and position k")
                 train_data_json = await websocket.recv()
                 train_data = json.loads(train_data_json)
-                print(train_data)
-                k = int(train_data['k'])
+                
+                k = int(train_data.get('k', 0))
+                
                 new_train = train_booking.TrainNode(train_data['tcode'], train_data['tname'], int(train_data['seat']), int(train_data['booked']), train_data['depart_time'], train_data['depart_place'], int(train_data['available_seat']))
 
-                train_list.add_after_position_k(k, new_train)
+                shared_data.train_list.add_after_position_k(k, new_train)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Insert train " + train_data['tname'] + " into position" + str(k) +  " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
+
             elif choice == '1.9':
                 await websocket.send("Input xCode")
                 x_code = await websocket.recv()
                 
-                train_list.delete_node_before_tcode(x_code)
+                shared_data.train_list.delete_node_before_tcode(x_code)
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Delete train before " + x_code + " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
+                
     # //////////////////////////////////////////////////////////////////////////
 
             elif choice == '2.1':
                 await websocket.send('Input customer file path')
                 filename = await websocket.recv()
-                customer_list.load_data_customer_from_file(filename)
+                shared_data.customer_list.load_data_customer_from_file(filename)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Load data from " + filename + " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
                 
             elif choice == '2.2':
                 await websocket.send("Input train data")
                 cus_data_json = await websocket.recv()
                 cus_data = json.loads(cus_data_json)
                 new_cus = train_booking.CustomerNode(cus_data['ccode'], cus_data['name'], cus_data['phone'])
-                customer_list.input_and_add_to_end(new_cus)
+                shared_data.customer_list.input_and_add_to_end(new_cus)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Insert customer data successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
                 
             elif choice == '2.3':
-                payload = customer_list.display_customer_data()
-                print(payload)
+                payload = shared_data.customer_list.display_customer_data()
                 await websocket.send(json.dumps(payload))
                 
             elif choice == '2.4':
                 await websocket.send("wait for inputing file name")
                 filename = await websocket.recv()
-                customer_list.save_data_cus_to_file(filename)
+                shared_data.customer_list.save_data_cus_to_file(filename)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Save into " + filename + " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
                 
             elif choice == '2.5':
                 await websocket.send("Input tcode")
                 ccode_to_search = await websocket.recv()
-                print(ccode_to_search)
                 arr = []
-                rs = customer_list.search_by_ccode(ccode_to_search)
-                print(rs)
+                rs = shared_data.customer_list.search_by_ccode(ccode_to_search)
                 if rs is not None:
                     arr.append(rs.to_dict())
-                print(arr)
                 await websocket.send(json.dumps(arr))
                 
             elif choice == '2.6':
                 await websocket.send("Input tcode")
                 ccode_to_delete = await websocket.recv()
-                customer_list.delete_by_ccode(ccode_to_delete)
+                shared_data.customer_list.delete_by_ccode(ccode_to_delete)
                 
                 alert = {
-                    "type": "alert",
+                    "type": "success",
                     "message": "Delete train " + ccode_to_delete + " successfully"
                 }
-                await websocket.send(json.dumps(alert))
+                await send_data_to_clients(alert)
                 
     # //////////////////////////////////////////////////////////////////////////
 
-            # if choice == '3.1':
-            #     booking_list.input_data(train_list, customer_list)
-            # elif choice == '3.2':
-            #     booking_list.display_data()
-            # elif choice == '3.3':
-            #     booking_list.sort_by_tcode_ccode()
+            if choice == '3.1':
+                await websocket.send('Wait for inputing data')
+                booking_data_json = await websocket.recv()
+                booking_data = json.loads(booking_data_json)
+                new_booking = train_booking.BookingNode(booking_data['tcode'], booking_data['ccode'], booking_data['num_seats'])
+                
+                
+                alert = {
+                    "type": "success",
+                    "message": "Booking data added successfully."
+                }
+                if not shared_data.booking_list.is_valid_booking(shared_data.train_list, shared_data.customer_list, new_booking) == "":
+                    alert["type"] = "danger"
+                    alert["message"] = shared_data.booking_list.is_valid_booking(shared_data.train_list, shared_data.customer_list, new_booking)
+                
+                shared_data.booking_list.input_data(shared_data.train_list, shared_data.customer_list, new_booking)
+                
+                print(alert)
+                await send_data_to_clients(alert)
+                
+            elif choice == '3.2':
+                payload = shared_data.booking_list.display_data()
+                print(payload)
+                await websocket.send(json.dumps(payload))
+            elif choice == '3.3':
+                shared_data.booking_list.sort_by_tcode_ccode()
+                alert = {
+                    "type": "success",
+                    "message": "Booking list is sorted successfully."
+                }
+                
+                await send_data_to_clients(alert)
             else:
                 print("Invalid choice. Please try again.")
             
         except websockets.exceptions.ConnectionClosed:
+            connected_clients.remove(websocket)
             print("Connection closed")
             break
 

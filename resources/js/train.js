@@ -164,13 +164,16 @@ document.getElementById("submitDeleteBefore").addEventListener("click", function
 
 // Function to populate existing table with data
 function populateTable(data) {
+    localStorage.setItem('trains', JSON.stringify(data))
+
+
     var tableBody = document.getElementById("trainListTable").getElementsByTagName('tbody')[0];
     tableBody.innerHTML = ""; // Clear existing data
 
     data.forEach(function (item) {
         var row = document.createElement("tr");
         row.innerHTML = "<td>" + item.tcode + "</td>" +
-            "<td>" + item.train_name + "</td>" +
+            "<td>" + item.tname + "</td>" +
             "<td>" + item.seat + "</td>" +
             "<td>" + item.booked + "</td>" +
             "<td>" + item.depart_time + "</td>" +
@@ -187,14 +190,14 @@ document.getElementById("openDisplayDataModal").addEventListener("click", functi
     socket.send('1.3')
 });
 
-document.getElementById("openSaveFile").addEventListener("click", function() {
+document.getElementById("openSaveFile").addEventListener("click", function () {
     // Mở modal
     var saveFileModal = new bootstrap.Modal(document.getElementById('saveFileModal'));
     saveFileModal.show();
 });
 
 // Xử lý khi người dùng nhấn vào nút "Save" trong modal
-document.getElementById("saveToFileBtn").addEventListener("click", function() {
+document.getElementById("saveToFileBtn").addEventListener("click", function () {
     socket.send('1.4')
     const fileName = document.getElementById("fileName").value;
     // Xử lý lưu file ở đây

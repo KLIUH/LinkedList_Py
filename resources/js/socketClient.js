@@ -9,16 +9,15 @@ socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     console.log(data);
 
-    if (data && data.type === "alert") {
+    if (data && data.type !== undefined) {
         const message = data.message;
     
         const alertDiv = document.createElement('div');
-        alertDiv.classList.add('alert', 'alert-success');
+        alertDiv.classList.add('alert', `alert-${data.type}`);
         alertDiv.setAttribute('role', 'alert');
         alertDiv.textContent = message;
     
-        const firstElement = document.body.firstChild;
-        document.body.insertBefore(alertDiv, firstElement);
+        document.querySelector('.notice').appendChild(alertDiv);
     
         setTimeout(function() {
             alertDiv.style.display = 'none';

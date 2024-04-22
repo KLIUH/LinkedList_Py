@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="notice"></div>
+    <div class="container mt-5">
+        <div class="d-flex align-items-center w-100 justify-content-between">
+            <h2 class="mr-3">Booking List</h2>
+
+            <!-- Dropdown menu -->
+            <div class="dropdown">
+                <a href="./customer.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary"
+                    id="customerButton">Customer</a>
+                <a href="./train.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary"
+                    id="trainButton">Train</a>
+
+
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Action
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="#" id="openInputModal">3.1 Input data</a></li>
+                    <li><a class="dropdown-item" href="#" id="openDisplayDataModal">3.2 Display data with available
+                            seats</a></li>
+                    <li><a class="dropdown-item" href="#" id="openSort">3.3 Sort by tcode + ccode</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Train List -->
+        <table class="table mt-3" id="customerListTable">
+            <thead>
+                <tr>
+                    <th scope="col">Tcode</th>
+                    <th scope="col">Ccode</th>
+                    <th scope="col">Num of Seats</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dữ liệu sẽ được thêm vào đây -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="inputModal" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputModalLabel">Input Customer Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to input data -->
+                    <form id="inputForm">
+                        <div class="mb-3">
+                            <label for="tcode" class="form-label">Tcode</label>
+                            <input type="text" class="form-control" id="tcode" name="tcode">
+                        </div>
+                        <div class="mb-3">
+                            <label for="ccode" class="form-label">Ccode</label>
+                            <input type="text" class="form-control" id="ccode" name="ccode">
+                        </div>
+                        <div class="mb-3">
+                            <label for="num_seats" class="form-label">Num of Seats</label>
+                            <input type="text" class="form-control" id="num_seats" name="num_seats">
+                        </div>
+
+                        <!-- Add other input fields for Seat, Booked, Depart Time, Depart Place, Available Seat -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="submitInput">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/socketClient.js"></script>
+    <script src="../js/booking.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
